@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.TextCore.Text;
 
@@ -7,11 +8,14 @@ public class CharacterManager : MonoBehaviour
 {
     public static CharacterManager instance;
 
-    [SerializeField] private Camera mainCamera;
-    [SerializeField] private float  selectionRadius = 32.0f;
+    [SerializeField] private Camera         mainCamera;
+    [SerializeField] private float          selectionRadius = 32.0f;
+    [SerializeField] private SpriteRenderer selectionBox;
 
     List<Character> characters;
     float           clickTime;
+    Vector2         clickPos;
+    bool            boxSelect;
     List<Character> selectedCharacters = new List<Character>();
 
     // Start is called before the first frame update
@@ -72,9 +76,65 @@ public class CharacterManager : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             clickTime = Time.time;
+            clickPos = mainCamera.ScreenPointToRay(Input.mousePosition).origin.xy();
+            boxSelect = false;
+            selectionBox.gameObject.SetActive(false);
+            selectionBox.transform.position = clickPos;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            Vector2 currentPos = mainCamera.ScreenPointToRay(Input.mousePosition).origin.xy();
+
+            if (Vector2.Distance(clickPos, currentPos) > 2.0f)
+            {
+                boxSelect = true;
+                selectionBox.gameObject.SetActive(true);
+            }
+
+            selectionBox.size = new Vector2(currentPos.x - clickPos.x, clickPos.y - currentPos.y);
         }
         else if (Input.GetMouseButtonUp(0))
         {
+            if (boxSelect)
+            {
+                // Left click, select characters
+                bool isControlPressed = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
+                if (!isControlPressed)
+                {
+                    ClearSelection();
+                }
+
+                Vector2 currentPos = mainCamera.ScreenPointToRay(Input.mousePosition).origin.xy();
+
+                Vector2 start = Vector2.zero;
+                Vector2 end = Vector2.zero;
+                if (currentPos.x < clickPos.x) { start.x = currentPos.x; end.x = clickPos.x; }
+                else { start.x = clickPos.x; end.x = currentPos.x; }
+                if (currentPos.y < clickPos.y) { start.y = currentPos.y; end.y = clickPos.y; }
+                else { start.y = clickPos.y; end.y = currentPos.y; }
+
+                start.x -= selectionRadius;
+                start.y -= selectionRadius;
+                end.x += selectionRadius;
+                end.y += selectionRadius;
+
+                foreach (var character in characters)
+                {
+                    if (selectedCharacters.IndexOf(character) == -1)
+                    {
+                        var pos = character.transform.position.xy() + Vector2.up * selectionRadius;
+                        if ((pos.x >= start.x) && (pos.x <= end.x) && (pos.y >= start.y) && (pos.y <= end.y))
+                        {
+                            selectedCharacters.Add(character);
+                        }
+                    }
+                }
+
+                foreach (var selectedCharacter in selectedCharacters)
+                {
+                    selectedCharacter.Select(true);
+                }
+            }
             if ((Time.time - clickTime) < 0.25f)
             {
                 // Left click, select characters
@@ -104,6 +164,8 @@ public class CharacterManager : MonoBehaviour
                     selectedCharacter.Select(true);
                 }
             }
+            clickTime = 0;
+            selectionBox.gameObject.SetActive(false);
         }
     }
 

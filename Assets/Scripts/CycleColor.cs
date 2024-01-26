@@ -23,13 +23,7 @@ public class CycleColor : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        timer -= Time.deltaTime;
-        if (timer <= 0)
-        {
-            index = (index + 1) % colors.Length;
-
-            timer = cycleSpeed;
-            spriteRenderer.color = colors[index];
-        }
+        index = Mathf.FloorToInt(Time.time / cycleSpeed) % colors.Length;
+        spriteRenderer.color = colors[index];
     }
 }
