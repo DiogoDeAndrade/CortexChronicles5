@@ -207,7 +207,7 @@ public class CharacterManager : MonoBehaviour
 
                 foreach (var c in selectedCharacters)
                 {
-                    c.Move(delta);
+                    c.ForceMove(delta);
                 }
             }
         }

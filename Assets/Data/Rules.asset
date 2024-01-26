@@ -13,5 +13,9 @@ MonoBehaviour:
   m_Name: Rules
   m_EditorClassIdentifier: 
   rules:
-  - {fileID: 11400000, guid: b4ef6900851747746a309e013d99c1fa, type: 2}
   - {fileID: 11400000, guid: 3183422363b3adf4ea7d3315eeda7d8d, type: 2}
+  - {fileID: 11400000, guid: b4ef6900851747746a309e013d99c1fa, type: 2}
+  - {fileID: 11400000, guid: 5d47acfbcbffa444390914400be819be, type: 2}
+  - {fileID: 11400000, guid: 1b2ecc29ad294904587730b7e0e11fa9, type: 2}
+  - {fileID: 11400000, guid: 60e89a092d3c7c9419c0a3acfc0948c0, type: 2}
+  - {fileID: 11400000, guid: 53b8066a3460cd94e8c3dc0277e4e919, type: 2}

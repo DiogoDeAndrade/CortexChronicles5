@@ -11,4 +11,17 @@ public static class Extensions
     {
         return UnityEngine.Random.Range(v.x, v.y);
     }
+
+    public static bool IsContained(this Emotion emotion, Emotion[] emotions)
+    {
+        foreach (var e in emotions)
+        {
+            if (e == emotion)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

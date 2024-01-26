@@ -40,29 +40,16 @@ public class Rule : ScriptableObject
         return false;
     }
 
-    bool IsInSet(Emotion emotion, Emotion[] emotions)
-    {
-        foreach (var e in emotions)
-        {
-            if (e == emotion)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     bool CanTriggerConversion(Character character, Dictionary<Character, float> distances)
     { 
-        if (!IsInSet(character.activeEmotion, sourceEmotions)) return false;
+        if (!character.activeEmotion.IsContained(sourceEmotions)) return false;
 
         int c = 0;
         foreach (var d in distances)
         {
             if (d.Value < radius)
             {
-                if (IsInSet(d.Key.activeEmotion, neighbourEmotions))
+                if (d.Key.activeEmotion.IsContained(neighbourEmotions))
                 {
                     c++;
                 }
