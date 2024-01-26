@@ -12,6 +12,8 @@ public class CharacterManager : MonoBehaviour
     [SerializeField] private float          selectionRadius = 32.0f;
     [SerializeField] private SpriteRenderer selectionBox;
     [SerializeField] public  Bounds         limits;
+    [SerializeField] public  LayerMask      losObstacles;
+    [SerializeField] public  bool           checkMovement = true;
 
     List<Character> characters;
     float           leftClickTime;

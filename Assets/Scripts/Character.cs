@@ -147,10 +147,27 @@ public class Character : MonoBehaviour
             }
         }
 
-        float distanceToTarget = Vector2.Distance(targetPos, transform.position);
+        Vector2 currentPos;
+        float   distanceToTarget = Vector2.Distance(targetPos, transform.position);
         if (distanceToTarget > 1)
         {
-            var nextPos = Vector2.MoveTowards(transform.position.xy(), targetPos, speedFactor * moveSpeed * Time.deltaTime);
+            currentPos = transform.position.xy();
+            var nextPos = Vector2.MoveTowards(currentPos, targetPos, speedFactor * moveSpeed * Time.deltaTime);
+
+            if (CharacterManager.instance.checkMovement)
+            {
+                // Check if we can move
+                Vector2 dir = nextPos - currentPos;
+                float   maxDist = dir.magnitude;
+                dir /= maxDist;
+                if (Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, maxDist, CharacterManager.instance.losObstacles))
+                {
+                    // Abort movement, make it so that the destination is the current pos
+                    nextPos = currentPos;
+                    targetPos = transform.position;
+                    forceMove = false;
+                }
+            }
 
             transform.position = new Vector3(nextPos.x, nextPos.y, 0.0f);
 
@@ -170,7 +187,7 @@ public class Character : MonoBehaviour
 
         characterGfx.localPosition = characterGfxBaseLocalPos + Vector3.up * bounceAmplitude * Mathf.Abs(Mathf.Sin(moveAngle * Mathf.Deg2Rad));
 
-        var currentPos = transform.position;
+        currentPos = transform.position;
         currentPos = new Vector3(currentPos.x, currentPos.y, GetZ(currentPos.y));
         transform.position = currentPos;
 
@@ -179,7 +196,7 @@ public class Character : MonoBehaviour
 
     float GetZ(float y)
     {
-        return 0.05f * (y + 1000.0f);
+        return 0.1f * (y + 1000.0f);
     }
 
     public void SetDistance(Character character, float distance)
@@ -209,7 +226,7 @@ public class Character : MonoBehaviour
         return (closest, minDist);
     }
 
-    public (Character, float) GetClosestCharacter(Emotion[] emotions)
+    public (Character, float) GetClosestCharacter(Emotion[] emotions, bool losCheck)
     {
         float minDist = float.MaxValue;
         Character closest = null;
@@ -220,6 +237,15 @@ public class Character : MonoBehaviour
             {
                 if (c.Value < minDist)
                 {
+                    if (losCheck)
+                    {
+                        Vector2 currentPos = transform.position.xy();
+                        Vector2 toCharacter = c.Key.transform.position.xy() - currentPos;
+                        float   maxDist = toCharacter.magnitude;
+                        toCharacter /= maxDist;
+                        var hit = Physics2D.Raycast(currentPos, toCharacter, maxDist, CharacterManager.instance.losObstacles);
+                        if (hit) continue;
+                    }
                     closest = c.Key;
                     minDist = c.Value;
                 }
@@ -308,7 +334,7 @@ public class Character : MonoBehaviour
             case Emotion.Angry:
                 {
                     // Angry finds the closest Happy, Neutral or Serene and moves towards them
-                    (var closest, var distance) = GetClosestCharacter(new [] { Emotion.Happy, Emotion.Neutral, Emotion.Serene });
+                    (var closest, var distance) = GetClosestCharacter(new [] { Emotion.Happy, Emotion.Neutral, Emotion.Serene }, true);
                     if ((closest) && (distance > 40.0f))
                     {
                         target = target + (closest.transform.position.xy() - target).normalized * 40.0f;
