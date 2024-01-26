@@ -13,7 +13,8 @@ public class CharacterManager : MonoBehaviour
     [SerializeField] private SpriteRenderer selectionBox;
 
     List<Character> characters;
-    float           clickTime;
+    float           leftClickTime;
+    float           rightClickTime;
     Vector2         clickPos;
     bool            boxSelect;
     List<Character> selectedCharacters = new List<Character>();
@@ -52,6 +53,7 @@ public class CharacterManager : MonoBehaviour
     private void Update()
     {
         RunSelection();
+        RunCommands();
 
         // Evaluate distances
         for (int i = 0; i < characters.Count; i++)
@@ -75,7 +77,7 @@ public class CharacterManager : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            clickTime = Time.time;
+            leftClickTime = Time.time;
             clickPos = mainCamera.ScreenPointToRay(Input.mousePosition).origin.xy();
             boxSelect = false;
             selectionBox.gameObject.SetActive(false);
@@ -135,7 +137,7 @@ public class CharacterManager : MonoBehaviour
                     selectedCharacter.Select(true);
                 }
             }
-            if ((Time.time - clickTime) < 0.25f)
+            if ((Time.time - leftClickTime) < 0.25f)
             {
                 // Left click, select characters
                 bool isControlPressed = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl);
@@ -164,7 +166,7 @@ public class CharacterManager : MonoBehaviour
                     selectedCharacter.Select(true);
                 }
             }
-            clickTime = 0;
+            leftClickTime = 0;
             selectionBox.gameObject.SetActive(false);
         }
     }
@@ -179,5 +181,35 @@ public class CharacterManager : MonoBehaviour
         }
 
         selectedCharacters.Clear();
+    }
+
+    void RunCommands()
+    {
+        if (selectedCharacters.Count == 0) return;
+
+        if (Input.GetMouseButtonDown(1))
+        {
+            rightClickTime = Time.time;
+        }
+        else if (Input.GetMouseButton(1))
+        {
+            if ((Time.time - rightClickTime) < 0.25f)
+            {
+                Vector3 avgPos = Vector3.zero;
+                foreach (var c in selectedCharacters)
+                {
+                    avgPos += c.transform.position;
+                }
+                avgPos /= selectedCharacters.Count;
+
+                Vector2 targetPos = mainCamera.ScreenPointToRay(Input.mousePosition).origin.xy();
+                Vector2 delta = targetPos - avgPos.xy();
+
+                foreach (var c in selectedCharacters)
+                {
+                    c.Move(delta);
+                }
+            }
+        }
     }
 }
