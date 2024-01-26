@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
 
 public class Character : MonoBehaviour
@@ -15,6 +16,7 @@ public class Character : MonoBehaviour
     [SerializeField] private Vector2    blinkTime = new Vector2(0.1f, 0.2f);
     [SerializeField] private GameObject selectionObject;
     [SerializeField] private Transform  characterGfx;
+    [SerializeField] private Ruleset    ruleset;
 
     Animator                        animator;
     int                             apEmotionId;
@@ -26,6 +28,15 @@ public class Character : MonoBehaviour
     Vector2                         targetPos;
     float                           moveAngle = 0.0f;
     Vector3                         characterGfxBaseLocalPos;
+
+    class RuleState
+    {
+        public bool trigger;
+        public float timeOfTrigger;
+    };
+    Dictionary<Rule, RuleState>     ruleState;
+
+    public Emotion activeEmotion => emotion;
 
     void Awake()
     {
@@ -39,6 +50,12 @@ public class Character : MonoBehaviour
         spriteRendererRightPupil = rightPupil.GetComponent<SpriteRenderer>();
 
         distances = new Dictionary<Character, float>();
+        ruleState = new Dictionary<Rule, RuleState>();
+        // Evaluate rules
+        foreach (var rule in ruleset.rules)
+        {
+            ruleState[rule] = new RuleState { trigger = false, timeOfTrigger = 0.0f };
+        }
 
         selectionObject.SetActive(false);
 
@@ -129,6 +146,8 @@ public class Character : MonoBehaviour
         var currentPos = transform.position;
         currentPos = new Vector3(currentPos.x, currentPos.y, GetZ(currentPos.y));
         transform.position = currentPos;
+
+        EvaluateRules();
     }
 
     float GetZ(float y)
@@ -171,5 +190,40 @@ public class Character : MonoBehaviour
     public void Move(Vector2 delta)
     {
         targetPos = transform.position.xy() + delta;
+    }
+
+    void EvaluateRules()
+    {
+        // Evaluate rules
+        foreach (var rule in ruleset.rules)
+        {
+            bool trigger = rule.CanTrigger(this, distances);
+            if (trigger)
+            {
+                if (!ruleState[rule].trigger)
+                {
+                    ruleState[rule].trigger = true;
+                    ruleState[rule].timeOfTrigger = Time.time;
+                }
+                rule.Run(this);
+            }
+            else
+            {
+                ruleState[rule].trigger = false;
+            }
+        }
+    }
+
+    public bool SetEmotion(Emotion emotion)
+    {
+        this.emotion = emotion;
+        
+        return true;
+    }
+
+    public float GetTimeOfRule(Rule rule)
+    {
+        if (!ruleState[rule].trigger) return Time.time + 1.0f;
+        return ruleState[rule].timeOfTrigger;
     }
 }

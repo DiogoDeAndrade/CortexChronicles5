@@ -130,7 +130,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32a8f88073c1e0440b83cafaa5813ccc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  emotion: 4
+  emotion: 0
   moveSpeed: 100
   bounceAmplitude: 5
   bounceSpeed: 720
@@ -141,6 +141,7 @@ MonoBehaviour:
   blinkTime: {x: 0.1, y: 0.2}
   selectionObject: {fileID: 3464103308230922640}
   characterGfx: {fileID: 5624435524150390262}
+  ruleset: {fileID: 11400000, guid: 0f756871a4463374bbe63ffb9c904473, type: 2}
 --- !u!1 &3464103308230922640
 GameObject:
   m_ObjectHideFlags: 0
