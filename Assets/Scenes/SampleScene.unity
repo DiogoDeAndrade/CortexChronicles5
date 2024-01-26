@@ -590,6 +590,9 @@ MonoBehaviour:
   mainCamera: {fileID: 519420031}
   selectionRadius: 16
   selectionBox: {fileID: 1030762564}
+  limits:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 480, y: 260, z: 0}
 --- !u!4 &987880998
 Transform:
   m_ObjectHideFlags: 0

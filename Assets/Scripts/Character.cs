@@ -258,6 +258,7 @@ public class Character : MonoBehaviour
 
     void RandomMovement()
     {
+        Bounds  limits = CharacterManager.instance.limits;
         Vector2 target = transform.position.xy();
 
         switch (emotion)
@@ -283,7 +284,7 @@ public class Character : MonoBehaviour
                     if (!foundMoving)
                     {
                         // Nobody was moving, let's move and (hopefully) ake everybody with us!
-                        target = new Vector2(Random.Range(-500.0f, 500.0f), Random.Range(-275.0f, 275.0f));
+                        target = new Vector2(Random.Range(limits.min.x, limits.max.x), Random.Range(limits.min.y, limits.max.y));
                         speedFactor = 0.6f;
                         nextMoveCooldown = 2.0f;
                     }
@@ -332,8 +333,14 @@ public class Character : MonoBehaviour
         }
 
         // Clamp to inside of play area
-
-        targetPos = target;
+        // If target pos is outside, don't consider it
+        if ((target.x > limits.min.x) &&
+            (target.y > limits.min.y) &&
+            (target.x < limits.max.x) &&
+            (target.y < limits.max.y))
+        {
+            commandTargetPos = targetPos = target;
+        }
     }
 
     void EvaluateRules()

@@ -11,6 +11,7 @@ public class CharacterManager : MonoBehaviour
     [SerializeField] private Camera         mainCamera;
     [SerializeField] private float          selectionRadius = 32.0f;
     [SerializeField] private SpriteRenderer selectionBox;
+    [SerializeField] public  Bounds         limits;
 
     List<Character> characters;
     float           leftClickTime;
