@@ -230,7 +230,7 @@ Camera:
   far clip plane: 1000
   field of view: 34
   orthographic: 1
-  orthographic size: 172
+  orthographic size: 242
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -518,6 +518,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c599887925308564d965844f18695dc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainCamera: {fileID: 519420031}
+  selectionRadius: 16
 --- !u!4 &987880998
 Transform:
   m_ObjectHideFlags: 0

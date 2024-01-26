@@ -10,6 +10,7 @@ public class Character : MonoBehaviour
     [SerializeField] private Vector2    radius = new Vector2(4,4);
     [SerializeField] private Vector2    blinkIntervalMinMax = new Vector2(2, 4);
     [SerializeField] private Vector2    blinkTime = new Vector2(0.1f, 0.2f);
+    [SerializeField] private GameObject selectionObject;
 
     Animator                        animator;
     int                             apEmotionId;
@@ -31,6 +32,8 @@ public class Character : MonoBehaviour
         spriteRendererRightPupil = rightPupil.GetComponent<SpriteRenderer>();
 
         distances = new Dictionary<Character, float>();
+
+        selectionObject.SetActive(false);
     }
 
     private void Start()
@@ -114,5 +117,10 @@ public class Character : MonoBehaviour
         }
 
         return closest;
+    }
+
+    public void Select(bool b)
+    {
+        selectionObject.SetActive(b);
     }
 }
