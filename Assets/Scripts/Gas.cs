@@ -55,6 +55,7 @@ public class Gas : MonoBehaviour
         {
             CharacterManager.instance = FindObjectOfType<CharacterManager>();
         }
+        if (CharacterManager.instance == null) return;
 
         Color c = (deathGas) ? Color.magenta : (CharacterManager.instance.GetColor(destEmotion));
 

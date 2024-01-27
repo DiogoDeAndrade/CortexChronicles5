@@ -17,7 +17,7 @@ MonoBehaviour:
   neighbourEmotions: 03000000
   radiusScale: 1
   comparison: 5
-  count: 2
+  count: 3
   targetEmotion: 3
   afterTime: 1
-  time: 5
+  time: 3

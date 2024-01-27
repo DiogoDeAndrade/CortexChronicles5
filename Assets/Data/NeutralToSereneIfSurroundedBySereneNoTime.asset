@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5f63302f58b803d4e8b403ad12795c16, type: 3}
-  m_Name: NeutralToSadIfAlone
+  m_Name: NeutralToSereneIfSurroundedBySereneNoTime
   m_EditorClassIdentifier: 
   type: 0
   sourceEmotions: 04000000
-  neighbourEmotions: 0000000001000000020000000300000004000000
+  neighbourEmotions: 03000000
   radiusScale: 1
-  comparison: 0
-  count: 1
-  targetEmotion: 1
-  afterTime: 1
-  time: 5
+  comparison: 5
+  count: 4
+  targetEmotion: 3
+  afterTime: 0
+  time: 3

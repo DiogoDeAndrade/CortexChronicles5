@@ -37,6 +37,8 @@ public class AreaManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI nextTutorialPage;
 
+    private float           tutorialFadeSpeed = 2.0f;
+
     bool            _isPlaying = true;
     float           tutorialTargetAlpha = 0.0f;
     TextMeshProUGUI tutorialText;
@@ -105,7 +107,7 @@ public class AreaManager : MonoBehaviour
         {
             if (tutorialTargetAlpha < tutorialObject.alpha)
             {
-                tutorialObject.alpha = Mathf.Clamp01(tutorialObject.alpha - Time.deltaTime);
+                tutorialObject.alpha = Mathf.Clamp01(tutorialObject.alpha - Time.deltaTime * tutorialFadeSpeed);
                 if (tutorialObject.alpha <= tutorialTargetAlpha)
                 {
                     tutorialObject.alpha = tutorialTargetAlpha;
@@ -116,7 +118,7 @@ public class AreaManager : MonoBehaviour
             }
             else if (tutorialTargetAlpha > tutorialObject.alpha)
             {
-                tutorialObject.alpha = Mathf.Clamp01(tutorialObject.alpha + Time.deltaTime);
+                tutorialObject.alpha = Mathf.Clamp01(tutorialObject.alpha + Time.deltaTime * tutorialFadeSpeed);
                 if (tutorialObject.alpha >= tutorialTargetAlpha)
                 {
                     tutorialObject.alpha = tutorialTargetAlpha;
