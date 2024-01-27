@@ -462,6 +462,23 @@ public class Character : MonoBehaviour
     {
         dead = true;
         canControl = false;
+
+        // Check if there's any non-dead controllable unit
+        var characters = FindObjectsOfType<Character>();
+        bool gameOver = true;
+        foreach (var character in characters)
+        {
+            if (character.isDead) continue;
+            if (!character.canBeControlled) continue;
+
+            gameOver = false;
+            break;
+        }
+
+        if (gameOver)
+        {
+            AreaManager.GameOver();
+        }
     }
 
     private void OnDrawGizmosSelected()

@@ -33,6 +33,8 @@ public class AreaManager : MonoBehaviour
     [SerializeField]
     private GameObject      congratulations;
     [SerializeField]
+    private GameObject      gameOver;
+    [SerializeField]
     private CanvasGroup     tutorialObject;
     [SerializeField]
     private TextMeshProUGUI nextTutorialPage;
@@ -134,6 +136,12 @@ public class AreaManager : MonoBehaviour
             _isPlaying = false;
             congratulations.SetActive(true);
         }
+
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            // Reload if R pressed
+            Restart();            
+        }
     }
 
     bool IsSuccess()
@@ -185,6 +193,11 @@ public class AreaManager : MonoBehaviour
         }
     }
 
+    public void Restart()
+    {
+        Fader.FadeOut(() => { SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex); });
+    }
+
     public void NextTutorial()
     {
         tutorialIndex++;
@@ -206,6 +219,20 @@ public class AreaManager : MonoBehaviour
             }
 
             EventSystem.current.SetSelectedGameObject(null);
+        }
+    }
+
+    void _GameOver()
+    {
+        _isPlaying = false;
+        gameOver.SetActive(true);
+    }
+
+    public static void GameOver()
+    {
+        if (instance)
+        {
+            instance._GameOver();
         }
     }
 

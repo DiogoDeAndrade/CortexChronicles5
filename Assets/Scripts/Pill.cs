@@ -73,6 +73,7 @@ public class Pill : MonoBehaviour
         if (CharacterManager.instance == null)
         {
             CharacterManager.instance = FindObjectOfType<CharacterManager>();
+            if (CharacterManager.instance == null) return;
         }
         SetColors();
     }
