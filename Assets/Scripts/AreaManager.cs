@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using NaughtyAttributes;
 using UnityEngine.SceneManagement;
+using TMPro;
+using UnityEngine.UI;
+using Unity.VisualScripting;
+using UnityEngine.EventSystems;
 
 public class AreaManager : MonoBehaviour
 {
@@ -10,6 +14,8 @@ public class AreaManager : MonoBehaviour
 
     [SerializeField]
     private string      nextLevelScene;
+    [SerializeField, ResizableTextArea]
+    private string[]    tutorial; 
 
     [SerializeField] 
     private Goal        goal;
@@ -25,9 +31,16 @@ public class AreaManager : MonoBehaviour
     private Emotion     emotion;
 
     [SerializeField]
-    private GameObject  congratulations;
+    private GameObject      congratulations;
+    [SerializeField]
+    private CanvasGroup     tutorialObject;
+    [SerializeField]
+    private TextMeshProUGUI nextTutorialPage;
 
-    bool _isPlaying = true;
+    bool            _isPlaying = true;
+    float           tutorialTargetAlpha = 0.0f;
+    TextMeshProUGUI tutorialText;
+    int             tutorialIndex;
 
     public static bool isPlaying => instance._isPlaying;
 
@@ -56,13 +69,62 @@ public class AreaManager : MonoBehaviour
     void Start()
     {
         congratulations.SetActive(false);
+        tutorialObject.gameObject.SetActive(false);
+        tutorialText = tutorialObject.GetComponentInChildren<TextMeshProUGUI>();
 
-        Fader.FadeIn(() => { _isPlaying = true; }, true);
+        Fader.FadeIn(() => 
+        {
+            if (GameManager.isTutorialEnabled)
+            {
+                tutorialObject.gameObject.SetActive(true);
+                tutorialObject.alpha = 0.0f;
+                tutorialTargetAlpha = 1.0f;
+                tutorialIndex = 0;
+                tutorialText.text = tutorial[0];
+
+                if (tutorial.Length > 1)
+                {
+                    nextTutorialPage.text = "Next page...";
+                }
+                else
+                {
+                    nextTutorialPage.text = "Start!";
+                }
+            }
+            else
+            {
+                _isPlaying = true;
+            }
+        }, true);
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (tutorialObject.gameObject.activeSelf)
+        {
+            if (tutorialTargetAlpha < tutorialObject.alpha)
+            {
+                tutorialObject.alpha = Mathf.Clamp01(tutorialObject.alpha - Time.deltaTime);
+                if (tutorialObject.alpha <= tutorialTargetAlpha)
+                {
+                    tutorialObject.alpha = tutorialTargetAlpha;
+                    tutorialObject.gameObject.SetActive(false);
+                    // Start playing
+                    _isPlaying = true;
+                }
+            }
+            else if (tutorialTargetAlpha > tutorialObject.alpha)
+            {
+                tutorialObject.alpha = Mathf.Clamp01(tutorialObject.alpha + Time.deltaTime);
+                if (tutorialObject.alpha >= tutorialTargetAlpha)
+                {
+                    tutorialObject.alpha = tutorialTargetAlpha;
+                    // Wait for next page...                
+                }
+            }
+        }
+
         if (!_isPlaying) return;
 
         if (IsSuccess())
@@ -118,6 +180,30 @@ public class AreaManager : MonoBehaviour
         if (IsSuccess())
         {
             Fader.FadeOut(() => { SceneManager.LoadScene(nextLevelScene); });
+        }
+    }
+
+    public void NextTutorial()
+    {
+        tutorialIndex++;
+        if (tutorialIndex >= tutorial.Length)
+        {
+            tutorialTargetAlpha = 0.0f;
+        }
+        else
+        {
+            tutorialText.text = tutorial[tutorialIndex];
+
+            if (tutorial.Length > (tutorialIndex + 1))
+            {
+                nextTutorialPage.text = "Next page...";
+            }
+            else
+            {
+                nextTutorialPage.text = "Start!";
+            }
+
+            EventSystem.current.SetSelectedGameObject(null);
         }
     }
 
