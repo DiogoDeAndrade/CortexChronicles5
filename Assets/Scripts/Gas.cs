@@ -51,6 +51,11 @@ public class Gas : MonoBehaviour
     {
         particleSystem = GetComponent<ParticleSystem>();
 
+        if (CharacterManager.instance == null)
+        {
+            CharacterManager.instance = FindObjectOfType<CharacterManager>();
+        }
+
         Color c = (deathGas) ? Color.magenta : (CharacterManager.instance.GetColor(destEmotion));
 
         var mainProps = particleSystem.main;

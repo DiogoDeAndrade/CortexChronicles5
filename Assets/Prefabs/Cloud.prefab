@@ -74,7 +74,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: ae7ed325a51693f448198dce8754ab3a, type: 3}
-  m_Color: {r: 1, g: 0, b: 1, a: 0.28235295}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.28235295}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 2
@@ -93,9 +93,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4952218038167971881}
+  - component: {fileID: 6870594087695504841}
   - component: {fileID: 3831795328121568660}
   - component: {fileID: 1305076081187316802}
-  - component: {fileID: 6870594087695504841}
   - component: {fileID: 5650310890410981162}
   m_Layer: 0
   m_Name: Cloud
@@ -120,6 +120,20 @@ Transform:
   - {fileID: 3723293084959503597}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6870594087695504841
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8503500525246279980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7cbfd568def2b95448e735bb832d4a9d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deathGas: 0
+  destEmotion: 2
 --- !u!198 &3831795328121568660
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -310,7 +324,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 0, b: 1, a: 0.28235295}
+      maxColor: {r: 1, g: 0, b: 0, a: 0.28235295}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -4917,20 +4931,6 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
---- !u!114 &6870594087695504841
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8503500525246279980}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7cbfd568def2b95448e735bb832d4a9d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  deathGas: 1
-  destEmotion: 0
 --- !u!114 &5650310890410981162
 MonoBehaviour:
   m_ObjectHideFlags: 0
