@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.IO.LowLevel.Unsafe;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 public class Character : MonoBehaviour
 {
@@ -37,6 +38,7 @@ public class Character : MonoBehaviour
     float                           speedFactor = 1.0f;
     bool                            dead = false;
     Vector3                         canControlIndicatorBaseLocalPos;
+    Transform                       trackTarget;
 
     class RuleState
     {
@@ -161,12 +163,28 @@ public class Character : MonoBehaviour
             }
             else
             {
-                if (!IsMoving())
+                if (trackTarget)
                 {
-                    moveCooldown -= Time.deltaTime;
-                    if (moveCooldown <= 0.0f)
+                    if (Vector2.Distance(transform.position, trackTarget.position) > 30.0f)
                     {
-                        RandomMovement();
+                        targetPos = trackTarget.position;
+                    }
+                    else
+                    {
+                        trackTarget = null;
+                        targetPos = transform.position;
+                        moveCooldown = 0.0f;
+                    }
+                }
+                else
+                {
+                    if (!IsMoving())
+                    {
+                        moveCooldown -= Time.deltaTime;
+                        if (moveCooldown <= 0.0f)
+                        {
+                            RandomMovement();
+                        }
                     }
                 }
             }
@@ -186,16 +204,26 @@ public class Character : MonoBehaviour
                     dir /= maxDist;
                     var hit = Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, maxDist, CharacterManager.instance.moveObstaclesLayer);
                     if ((hit) && (Vector2.Dot(hit.normal, dir) < 0))
-                    {                        
-                        // Move to the closest position computed
-                        var moveDelta = nextPos - currentPos;
-                        nextPos = currentPos + moveDelta.normalized * hit.distance;
+                    {
+                        if (hit.distance < 1e-6f)
+                        {
+                            // Abort movement
+                            targetPos = nextPos = currentPos;
+                            forceMove = false;
+                            moveCooldown = nextMoveCooldown;
+                        }
+                        else
+                        {
+                            // Move to the closest position computed
+                            var moveDelta = nextPos - currentPos;
+                            nextPos = currentPos + moveDelta.normalized * hit.distance;
 
-                        // Compute the new move direction with sliding
-                        moveDelta = (currentPos + moveDelta) - nextPos;
-                        moveDelta = moveDelta - hit.normal * Vector2.Dot(hit.normal, moveDelta);
+                            // Compute the new move direction with sliding
+                            moveDelta = (currentPos + moveDelta) - nextPos;
+                            moveDelta = moveDelta - hit.normal * Vector2.Dot(hit.normal, moveDelta);
 
-                        nextPos = nextPos + moveDelta;
+                            nextPos = nextPos + moveDelta;
+                        }
                     }
                 }
 
@@ -332,10 +360,17 @@ public class Character : MonoBehaviour
                         {
                             Vector2 delta = c.GetDeltaMovement();
                             target = target + delta;
-                            foundMoving = true;
-                            speedFactor = c.GetSpeedFactor() * 0.8f;
-                            nextMoveCooldown = 2.0f;
-                            break;
+
+                            // Check if we have LOS to target
+                            if (CheckLOS(transform.position.xy(), target))
+                            {
+                                foundMoving = true;
+                                speedFactor = c.GetSpeedFactor() * 0.8f;
+                                nextMoveCooldown = 2.0f;
+
+                                trackTarget = c.transform;
+                                break;
+                            }
                         }
                     }
                     if (!foundMoving)
@@ -344,6 +379,12 @@ public class Character : MonoBehaviour
                         target = new Vector2(Random.Range(limits.min.x, limits.max.x), Random.Range(limits.min.y, limits.max.y));
                         speedFactor = 0.6f;
                         nextMoveCooldown = 2.0f;
+
+                        // Check if we have LOS to target
+                        if (!CheckLOS(transform.position.xy(), target))
+                        {
+                            return;
+                        }
                     }
                 }
                 break;
@@ -398,6 +439,24 @@ public class Character : MonoBehaviour
         {
             commandTargetPos = targetPos = target;
         }
+    }
+
+    bool CheckLOS(Vector3 currentPos, Vector3 targetPos)
+    {
+        var dir = targetPos - currentPos;
+        var dist = dir.magnitude;
+        if (dist > 0)
+        {
+            dir /= dist;
+
+            if (Physics2D.CircleCast(currentPos, 22.0f, dir, dist, CharacterManager.instance.losObstaclesLayer))
+            {
+                return false;
+            }
+
+            return true;
+        }
+        return false;
     }
 
     void EvaluateRules()
@@ -490,5 +549,15 @@ public class Character : MonoBehaviour
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, r);
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (IsMoving())
+        {
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawLine(transform.position, targetPos);
+        }
+
     }
 }

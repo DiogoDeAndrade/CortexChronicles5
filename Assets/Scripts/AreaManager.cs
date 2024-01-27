@@ -76,30 +76,37 @@ public class AreaManager : MonoBehaviour
         tutorialObject.gameObject.SetActive(false);
         tutorialText = tutorialObject.GetComponentInChildren<TextMeshProUGUI>();
 
-        Fader.FadeIn(() => 
+        if (Fader.exists())
         {
-            if (GameManager.isTutorialEnabled)
+            Fader.FadeIn(() =>
             {
-                tutorialObject.gameObject.SetActive(true);
-                tutorialObject.alpha = 0.0f;
-                tutorialTargetAlpha = 1.0f;
-                tutorialIndex = 0;
-                tutorialText.text = tutorial[0];
-
-                if (tutorial.Length > 1)
+                if (GameManager.isTutorialEnabled)
                 {
-                    nextTutorialPage.text = "Next page...";
+                    tutorialObject.gameObject.SetActive(true);
+                    tutorialObject.alpha = 0.0f;
+                    tutorialTargetAlpha = 1.0f;
+                    tutorialIndex = 0;
+                    tutorialText.text = tutorial[0];
+
+                    if (tutorial.Length > 1)
+                    {
+                        nextTutorialPage.text = "Next page...";
+                    }
+                    else
+                    {
+                        nextTutorialPage.text = "Start!";
+                    }
                 }
                 else
                 {
-                    nextTutorialPage.text = "Start!";
+                    _isPlaying = true;
                 }
-            }
-            else
-            {
-                _isPlaying = true;
-            }
-        }, true);
+            }, true);
+        }
+        else
+        {
+            _isPlaying = true;
+        }
     }
 
     // Update is called once per frame
@@ -159,6 +166,8 @@ public class AreaManager : MonoBehaviour
 
     bool CountReachPosition()
     {
+        if (target == null) return false;
+
         // Get all near the target position
         var hits = Physics2D.OverlapCircleAll(target.position, radius, CharacterManager.instance.characterLayer);
         int c = 0;

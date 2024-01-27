@@ -65,4 +65,9 @@ public class Fader : MonoBehaviour
         instance.callback = callback;
         instance.targetAlpha = 0.0f;
     }
+
+    public static bool exists()
+    {
+        return (instance != null);
+    }
 }
