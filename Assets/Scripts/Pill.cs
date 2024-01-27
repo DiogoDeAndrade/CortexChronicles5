@@ -25,42 +25,45 @@ public class Pill : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        var hit = Physics2D.OverlapCircle(transform.position.xy(), 16.0f, CharacterManager.instance.characterLayer);
-        if (hit != null)
+        var hits = Physics2D.OverlapCircleAll(transform.position.xy(), 16.0f, CharacterManager.instance.characterLayer);
+        if ((hits != null) && (hits.Length > 0))
         {
-            var character = hit.GetComponent<Character>();
-            if (character)
+            foreach (var hit in hits)
             {
-                if ((sourceIsAny) || (character.activeEmotion == sourceEmotion))
+                var character = hit.GetComponent<Character>();
+                if ((character) && (!character.isDead))
                 {
-                    character.SetEmotion(destEmotion);
-                }
-                else
-                {
-                    switch (sideEffect)
+                    if ((sourceIsAny) || (character.activeEmotion == sourceEmotion))
                     {
-                        case SideEffect.None:
-                            break;
-                        case SideEffect.Death:
-                            character.Die();
-                            break;
-                        case SideEffect.Random:
-                            Emotion newEmotion;
-                            while (true)
-                            {
-                                newEmotion = (Emotion)Random.Range(0, 5);
-                                if (newEmotion == destEmotion) continue;
-                                if (newEmotion == character.activeEmotion) continue;
-                                break;
-                            }
-                            character.SetEmotion(newEmotion);
-                            break;
-                        default:
-                            break;
+                        character.SetEmotion(destEmotion);
                     }
+                    else
+                    {
+                        switch (sideEffect)
+                        {
+                            case SideEffect.None:
+                                break;
+                            case SideEffect.Death:
+                                character.Die();
+                                break;
+                            case SideEffect.Random:
+                                Emotion newEmotion;
+                                while (true)
+                                {
+                                    newEmotion = (Emotion)Random.Range(0, 5);
+                                    if (newEmotion == destEmotion) continue;
+                                    if (newEmotion == character.activeEmotion) continue;
+                                    break;
+                                }
+                                character.SetEmotion(newEmotion);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    Destroy(gameObject);
+                    return;
                 }
-
-                Destroy(gameObject);
             }
         }
     }
