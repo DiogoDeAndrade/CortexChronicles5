@@ -20,6 +20,7 @@ public class Character : MonoBehaviour
 
     Animator                        animator;
     int                             apEmotionId;
+    int                             apDeadId;
     float                           blinkTimerA = 0;
     float                           blinkTimerB = 0;
     SpriteRenderer                  spriteRendererLeftPupil;
@@ -33,6 +34,7 @@ public class Character : MonoBehaviour
     float                           moveCooldown;
     float                           nextMoveCooldown;
     float                           speedFactor = 1.0f;
+    bool                            dead = false;
 
     class RuleState
     {
@@ -41,13 +43,15 @@ public class Character : MonoBehaviour
     };
     Dictionary<Rule, RuleState>     ruleState;
 
-    public Emotion activeEmotion => emotion;
-    public bool    canBeControlled => canControl;
+    public Emotion  activeEmotion => emotion;
+    public bool     canBeControlled => canControl;
+    public bool     isDead => dead;
 
     void Awake()
     {
         animator = GetComponentInChildren<Animator>();
         apEmotionId = Animator.StringToHash("Emotion");
+        apDeadId = Animator.StringToHash("isDead");
 
         blinkTimerA = blinkIntervalMinMax.Random();
         blinkTimerB = 0;
@@ -85,117 +89,125 @@ public class Character : MonoBehaviour
 
     void Update()
     {
-        animator.SetInteger(apEmotionId, (int)emotion);
-
-        (var closest, var dist) = GetClosestCharacter();
-        var lookAtPos = closest?.transform;
-        
-        if (lookAtPos)
+        if (dead)
         {
-            var leftEyePos = leftPupil.parent.position;
-            var rightEyePos = rightPupil.parent.position;
-            float eyeZ = leftPupil.position.z;
-            if (emotion == Emotion.Sad)
+            characterGfx.localPosition = characterGfxBaseLocalPos;
+            animator.SetBool(apDeadId, true);
+        }
+        else
+        {
+            animator.SetInteger(apEmotionId, (int)emotion);
+
+            (var closest, var dist) = GetClosestCharacter();
+            var lookAtPos = closest?.transform;
+
+            if (lookAtPos)
             {
-                leftPupil.position = new Vector3(leftEyePos.x, leftEyePos.y - radius.y, eyeZ);
-                rightPupil.position = new Vector3(rightEyePos.x, rightEyePos.y - radius.y, eyeZ); 
+                var leftEyePos = leftPupil.parent.position;
+                var rightEyePos = rightPupil.parent.position;
+                float eyeZ = leftPupil.position.z;
+                if (emotion == Emotion.Sad)
+                {
+                    leftPupil.position = new Vector3(leftEyePos.x, leftEyePos.y - radius.y, eyeZ);
+                    rightPupil.position = new Vector3(rightEyePos.x, rightEyePos.y - radius.y, eyeZ);
+                }
+                else
+                {
+                    var r = radius;
+                    if (emotion == Emotion.Angry) r *= 0.5f;
+
+                    var leftDir = (lookAtPos.position - leftEyePos).normalized;
+                    var rightDir = (lookAtPos.position - leftEyePos).normalized;
+                    leftPupil.position = new Vector3(leftEyePos.x + leftDir.x * r.x, leftEyePos.y + leftDir.y * r.y, eyeZ);
+                    rightPupil.position = new Vector3(rightEyePos.x + rightDir.x * r.x, rightEyePos.y + rightDir.y * r.y, eyeZ);
+                }
+            }
+
+            if (blinkTimerA > 0)
+            {
+                blinkTimerA -= Time.deltaTime;
+
+                if (blinkTimerA <= 0)
+                {
+                    blinkTimerB = blinkTime.Random();
+                }
+            }
+            if (blinkTimerB > 0)
+            {
+                blinkTimerB -= Time.deltaTime;
+                if (blinkTimerB <= 0)
+                {
+                    blinkTimerA = blinkIntervalMinMax.Random();
+                }
+            }
+
+            spriteRendererLeftPupil.enabled = spriteRendererRightPupil.enabled = (blinkTimerA > 0);
+
+            // Movement
+            if (forceMove)
+            {
+                targetPos = commandTargetPos;
             }
             else
             {
-                var r = radius;
-                if (emotion == Emotion.Angry) r *= 0.5f;
-
-                var leftDir = (lookAtPos.position - leftEyePos).normalized;
-                var rightDir = (lookAtPos.position - leftEyePos).normalized;
-                leftPupil.position = new Vector3(leftEyePos.x + leftDir.x * r.x, leftEyePos.y + leftDir.y * r.y, eyeZ);
-                rightPupil.position = new Vector3(rightEyePos.x + rightDir.x * r.x, rightEyePos.y + rightDir.y * r.y, eyeZ);
-            }
-        }
-
-        if (blinkTimerA > 0)
-        {
-            blinkTimerA -= Time.deltaTime;
-
-            if (blinkTimerA <= 0)
-            {
-                blinkTimerB = blinkTime.Random();
-            }
-        }
-        if (blinkTimerB > 0)
-        {
-            blinkTimerB -= Time.deltaTime;
-            if (blinkTimerB <= 0)
-            {
-                blinkTimerA = blinkIntervalMinMax.Random();
-            }
-        }
-
-        spriteRendererLeftPupil.enabled = spriteRendererRightPupil.enabled = (blinkTimerA > 0);
-
-        // Movement
-        if (forceMove)
-        {
-            targetPos = commandTargetPos;
-        }
-        else
-        {
-            if (!IsMoving())
-            {
-                moveCooldown -= Time.deltaTime;
-                if (moveCooldown <= 0.0f)
+                if (!IsMoving())
                 {
-                    RandomMovement();
-                }
-            }
-        }
-
-        Vector2 currentPos;
-        float   distanceToTarget = Vector2.Distance(targetPos, transform.position);
-        if (distanceToTarget > 1)
-        {
-            currentPos = transform.position.xy();
-            var nextPos = Vector2.MoveTowards(currentPos, targetPos, speedFactor * moveSpeed * Time.deltaTime);
-
-            if (CharacterManager.instance.checkMovement)
-            {
-                // Check if we can move
-                Vector2 dir = nextPos - currentPos;
-                float   maxDist = dir.magnitude;
-                dir /= maxDist;
-                var hit = Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, maxDist, CharacterManager.instance.moveObstacles);
-                if (hit)
-                {
-                    // Move to the closest position computed
-                    var moveDelta = nextPos - currentPos;
-                    nextPos = currentPos + moveDelta.normalized * hit.distance;
-
-                    // Compute the new move direction with sliding
-                    moveDelta = (currentPos + moveDelta) - nextPos;
-                    moveDelta = moveDelta - hit.normal * Vector2.Dot(hit.normal, moveDelta);
-
-                    nextPos = nextPos + moveDelta;
+                    moveCooldown -= Time.deltaTime;
+                    if (moveCooldown <= 0.0f)
+                    {
+                        RandomMovement();
+                    }
                 }
             }
 
-            transform.position = new Vector3(nextPos.x, nextPos.y, 0.0f);
-
-            moveAngle += bounceSpeed * Time.deltaTime;
-            moveCooldown = nextMoveCooldown;
-        }
-        else
-        {
-            forceMove = false;
-
-            float distFromCenter = moveAngle % 180.0f;
-            if (distFromCenter > 5.0f)
+            Vector2 currentPos;
+            float distanceToTarget = Vector2.Distance(targetPos, transform.position);
+            if (distanceToTarget > 1)
             {
+                currentPos = transform.position.xy();
+                var nextPos = Vector2.MoveTowards(currentPos, targetPos, speedFactor * moveSpeed * Time.deltaTime);
+
+                if (CharacterManager.instance.checkMovement)
+                {
+                    // Check if we can move
+                    Vector2 dir = nextPos - currentPos;
+                    float maxDist = dir.magnitude;
+                    dir /= maxDist;
+                    var hit = Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, maxDist, CharacterManager.instance.moveObstaclesLayer);
+                    if (hit)
+                    {
+                        // Move to the closest position computed
+                        var moveDelta = nextPos - currentPos;
+                        nextPos = currentPos + moveDelta.normalized * hit.distance;
+
+                        // Compute the new move direction with sliding
+                        moveDelta = (currentPos + moveDelta) - nextPos;
+                        moveDelta = moveDelta - hit.normal * Vector2.Dot(hit.normal, moveDelta);
+
+                        nextPos = nextPos + moveDelta;
+                    }
+                }
+
+                transform.position = new Vector3(nextPos.x, nextPos.y, 0.0f);
+
                 moveAngle += bounceSpeed * Time.deltaTime;
+                moveCooldown = nextMoveCooldown;
             }
+            else
+            {
+                forceMove = false;
+
+                float distFromCenter = moveAngle % 180.0f;
+                if (distFromCenter > 5.0f)
+                {
+                    moveAngle += bounceSpeed * Time.deltaTime;
+                }
+            }
+
+            characterGfx.localPosition = characterGfxBaseLocalPos + Vector3.up * bounceAmplitude * Mathf.Abs(Mathf.Sin(moveAngle * Mathf.Deg2Rad));
+
+            EvaluateRules();
         }
-
-        characterGfx.localPosition = characterGfxBaseLocalPos + Vector3.up * bounceAmplitude * Mathf.Abs(Mathf.Sin(moveAngle * Mathf.Deg2Rad));
-
-        EvaluateRules();
     }
 
     public void SetDistance(Character character, float distance)
@@ -215,6 +227,7 @@ public class Character : MonoBehaviour
 
         foreach (var c in distances)
         {
+            if (c.Key.isDead) continue;
             if (c.Value < minDist)
             {
                 closest = c.Key;
@@ -232,6 +245,7 @@ public class Character : MonoBehaviour
 
         foreach (var c in distances)
         {
+            if (c.Key.isDead) continue;
             if (c.Key.emotion.IsContained(emotions))
             {
                 if (c.Value < minDist)
@@ -242,7 +256,7 @@ public class Character : MonoBehaviour
                         Vector2 toCharacter = c.Key.transform.position.xy() - currentPos;
                         float   maxDist = toCharacter.magnitude;
                         toCharacter /= maxDist;
-                        var hit = Physics2D.Raycast(currentPos, toCharacter, maxDist, CharacterManager.instance.losObstacles);
+                        var hit = Physics2D.Raycast(currentPos, toCharacter, maxDist, CharacterManager.instance.losObstaclesLayer);
                         if (hit) continue;
                     }
                     closest = c.Key;
@@ -413,6 +427,7 @@ public class Character : MonoBehaviour
 
         foreach (var c in distances)
         {
+            if (c.Key.isDead) continue;
             if (c.Value < maxRadius)
             {
                 if (c.Key.emotion.IsContained(emotions))
@@ -423,6 +438,12 @@ public class Character : MonoBehaviour
         }
 
         return ret;
+    }
+
+    public void Die()
+    {
+        dead = true;
+        canControl = false;
     }
 
     private void OnDrawGizmosSelected()

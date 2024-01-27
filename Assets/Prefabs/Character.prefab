@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1188646327733830986}
   - component: {fileID: 6107229276515173453}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Mouth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,8 @@ GameObject:
   - component: {fileID: 3720326430634744662}
   - component: {fileID: 8952082501003197339}
   - component: {fileID: 3227209457519185654}
-  m_Layer: 0
+  - component: {fileID: 7362399941978031948}
+  m_Layer: 7
   m_Name: Character
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -132,6 +133,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   emotion: 0
+  canControl: 1
   moveSpeed: 100
   bounceAmplitude: 5
   bounceSpeed: 720
@@ -142,7 +144,6 @@ MonoBehaviour:
   blinkTime: {x: 0.1, y: 0.2}
   selectionObject: {fileID: 3464103308230922640}
   characterGfx: {fileID: 5624435524150390262}
-  ruleset: {fileID: 11400000, guid: 0f756871a4463374bbe63ffb9c904473, type: 2}
 --- !u!114 &3227209457519185654
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -155,6 +156,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f25581c3763ddb44096c22436dfff299, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!58 &7362399941978031948
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2112878103408632516}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ForceSendLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ForceReceiveLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_ContactCaptureLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_CallbackLayers:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_IsTrigger: 1
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 16}
+  serializedVersion: 2
+  m_Radius: 20
 --- !u!1 &3464103308230922640
 GameObject:
   m_ObjectHideFlags: 0
@@ -166,7 +202,7 @@ GameObject:
   - component: {fileID: 2407251554605509098}
   - component: {fileID: 4777541847009293751}
   - component: {fileID: 3544936987213021533}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Selected
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -272,7 +308,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1770346517722282023}
   - component: {fileID: 6268361749687915222}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EyeLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -357,7 +393,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4926612471039831423}
   - component: {fileID: 3859628548696343141}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: EyeRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -442,7 +478,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3595538083412919262}
   - component: {fileID: 4523826171842266112}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PupilLeft
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -526,7 +562,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6465322417521851864}
   - component: {fileID: 296362837010386750}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Shadow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -610,7 +646,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6622654734865909718}
   - component: {fileID: 8386775421502500667}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: PupilRight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -695,7 +731,7 @@ GameObject:
   - component: {fileID: 5624435524150390262}
   - component: {fileID: 8926762904112720395}
   - component: {fileID: 821795361089534913}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Gfx
   m_TagString: Untagged
   m_Icon: {fileID: 0}

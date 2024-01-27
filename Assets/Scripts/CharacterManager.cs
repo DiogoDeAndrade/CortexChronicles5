@@ -12,11 +12,13 @@ public class CharacterManager : MonoBehaviour
     [SerializeField] private float          selectionRadius = 32.0f;
     [SerializeField] private SpriteRenderer selectionBox;
     [SerializeField] public  Bounds         limits;
-    [SerializeField] public  LayerMask      losObstacles;
-    [SerializeField] public  LayerMask      moveObstacles;
+    [SerializeField] public  LayerMask      losObstaclesLayer;
+    [SerializeField] public  LayerMask      moveObstaclesLayer;
+    [SerializeField] public  LayerMask      characterLayer;
     [SerializeField] public  float          neighborRadius = 140.0f;
     [SerializeField] public  bool           checkMovement = true;
     [SerializeField] private Ruleset        ruleset;
+    [SerializeField] private Color[]        emotionColors;
 
     List<Character> characters;
     float           leftClickTime;
@@ -27,11 +29,12 @@ public class CharacterManager : MonoBehaviour
     List<Rule>      _rules;
 
     public List<Rule> rules => _rules;
+    public Color GetColor(Emotion emotion) => emotionColors[(int)emotion];
 
     // Start is called before the first frame update
     void Awake()
     {
-        if (instance == null)
+        if ((instance == null) || (instance == this))
         {
             instance = this;
         }

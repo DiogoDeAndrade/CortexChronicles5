@@ -19,5 +19,5 @@ MonoBehaviour:
   comparison: 5
   count: 2
   targetEmotion: 0
-  afterTime: 0
+  afterTime: 1
   time: 2
