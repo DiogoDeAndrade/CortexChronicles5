@@ -12,12 +12,18 @@ This time, I'm using Unity, since I don't want to struggle with the engine, and 
 
 ## Art
 
+- Tiles by the following, licensed [CC-BY-SA 3.0], [GLP 2.0] and [GPL 3.0]:
+  - [Sharm]
+  - [daneeklu]
+  - [Hyptosis]
+  - [Johann C]
+  - [William.Thompsonj]
+  - [wulax]
 
 ## Licenses
 
 - All game source code by Diogo de Andrade is licensed under the [MIT] license.
 - All remaining art by Diogo de Andrade, available throught the [CC0] license.
-
 
 ## Metadata
 
@@ -25,4 +31,13 @@ This time, I'm using Unity, since I don't want to struggle with the engine, and 
 
 [Diogo Andrade]:https://github.com/DiogoDeAndrade
 [CC0]:https://creativecommons.org/publicdomain/zero/1.0/
+[CC-BY-SA 3.0]:http://creativecommons.org/licenses/by-sa/3.0/
+[GLP 2.0]:https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+[GPL 3.0]:https://www.gnu.org/licenses/gpl-3.0.html
 [MIT]:LICENSE
+[Sharm]:https://opengameart.org/users/sharm
+[daneeklu]:https://opengameart.org/users/daneeklu
+[Hyptosis]:https://opengameart.org/users/hyptosis
+[Johann C]:https://opengameart.org/users/johann-c
+[William.Thompsonj]:https://opengameart.org/users/williamthompsonj
+[wulax]:https://opengameart.org/users/wulax
