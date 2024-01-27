@@ -183,8 +183,8 @@ public class Character : MonoBehaviour
                     float maxDist = dir.magnitude;
                     dir /= maxDist;
                     var hit = Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, maxDist, CharacterManager.instance.moveObstaclesLayer);
-                    if (hit)
-                    {
+                    if ((hit) && (Vector2.Dot(hit.normal, dir) < 0))
+                    {                        
                         // Move to the closest position computed
                         var moveDelta = nextPos - currentPos;
                         nextPos = currentPos + moveDelta.normalized * hit.distance;
