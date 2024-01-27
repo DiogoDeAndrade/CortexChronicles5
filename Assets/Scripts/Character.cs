@@ -17,6 +17,7 @@ public class Character : MonoBehaviour
     [SerializeField] private Vector2    blinkTime = new Vector2(0.1f, 0.2f);
     [SerializeField] private GameObject selectionObject;
     [SerializeField] private Transform  characterGfx;
+    [SerializeField] private GameObject canControlIndicator;
 
     Animator                        animator;
     int                             apEmotionId;
@@ -35,6 +36,7 @@ public class Character : MonoBehaviour
     float                           nextMoveCooldown;
     float                           speedFactor = 1.0f;
     bool                            dead = false;
+    Vector3                         canControlIndicatorBaseLocalPos;
 
     class RuleState
     {
@@ -68,6 +70,7 @@ public class Character : MonoBehaviour
         moveCooldown = 2.0f;
 
         characterGfxBaseLocalPos = characterGfx.localPosition;
+        if (canControlIndicator) canControlIndicatorBaseLocalPos = canControlIndicator.transform.localPosition;
     }
 
     private void Start()
@@ -89,6 +92,12 @@ public class Character : MonoBehaviour
 
     void Update()
     {
+        if (canControlIndicator)
+        {
+            canControlIndicator.SetActive(canControl && !selectionObject.activeSelf);
+            canControlIndicator.transform.localPosition = new Vector3(canControlIndicatorBaseLocalPos.x, canControlIndicatorBaseLocalPos.y + 3.0f * Mathf.Sin(Time.time * 10.0f), canControlIndicatorBaseLocalPos.z);
+        }
+
         if (dead)
         {
             characterGfx.localPosition = characterGfxBaseLocalPos;
@@ -160,11 +169,11 @@ public class Character : MonoBehaviour
                 }
             }
 
-            Vector2 currentPos;
+            Vector2 currentPos = transform.position.xy();
+            Vector2 prevPos = currentPos;
             float distanceToTarget = Vector2.Distance(targetPos, transform.position);
             if (distanceToTarget > 1)
             {
-                currentPos = transform.position.xy();
                 var nextPos = Vector2.MoveTowards(currentPos, targetPos, speedFactor * moveSpeed * Time.deltaTime);
 
                 if (CharacterManager.instance.checkMovement)
@@ -203,6 +212,13 @@ public class Character : MonoBehaviour
                     moveAngle += bounceSpeed * Time.deltaTime;
                 }
             }
+
+            Vector2 finalDir = transform.position.xy() - prevPos;
+            Quaternion rotation = Quaternion.identity;
+            if (finalDir.x > 0.1f) rotation = Quaternion.Euler(0.0f, 0.0f, -10.0f);
+            else if (finalDir.x < -0.1f) rotation = Quaternion.Euler(0.0f, 0.0f, 10.0f);
+
+            characterGfx.localRotation = Quaternion.RotateTowards(characterGfx.localRotation, rotation, 90.0f * Time.deltaTime);
 
             characterGfx.localPosition = characterGfxBaseLocalPos + Vector3.up * bounceAmplitude * Mathf.Abs(Mathf.Sin(moveAngle * Mathf.Deg2Rad));
 
