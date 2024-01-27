@@ -6,6 +6,7 @@ using UnityEngine;
 public class Character : MonoBehaviour
 {
     [SerializeField] private Emotion    emotion = Emotion.Neutral;
+    [SerializeField] private bool       canControl = true;
     [SerializeField] private float      moveSpeed = 50.0f;
     [SerializeField] private float      bounceAmplitude = 5.0f;
     [SerializeField] private float      bounceSpeed = 5.0f;
@@ -41,6 +42,7 @@ public class Character : MonoBehaviour
     Dictionary<Rule, RuleState>     ruleState;
 
     public Emotion activeEmotion => emotion;
+    public bool    canBeControlled => canControl;
 
     void Awake()
     {
@@ -160,12 +162,18 @@ public class Character : MonoBehaviour
                 Vector2 dir = nextPos - currentPos;
                 float   maxDist = dir.magnitude;
                 dir /= maxDist;
-                if (Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, maxDist, CharacterManager.instance.moveObstacles))
+                var hit = Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, maxDist, CharacterManager.instance.moveObstacles);
+                if (hit)
                 {
-                    // Abort movement, make it so that the destination is the current pos
-                    nextPos = currentPos;
-                    targetPos = transform.position;
-                    forceMove = false;
+                    // Move to the closest position computed
+                    var moveDelta = nextPos - currentPos;
+                    nextPos = currentPos + moveDelta.normalized * hit.distance;
+
+                    // Compute the new move direction with sliding
+                    moveDelta = (currentPos + moveDelta) - nextPos;
+                    moveDelta = moveDelta - hit.normal * Vector2.Dot(hit.normal, moveDelta);
+
+                    nextPos = nextPos + moveDelta;
                 }
             }
 
@@ -371,7 +379,6 @@ public class Character : MonoBehaviour
             {
                 if (!ruleState[rule].trigger)
                 {
-                    Debug.Log($"{rule.name} triggred at {Time.time}");
                     ruleState[rule].trigger = true;
                     ruleState[rule].timeOfTrigger = Time.time;
                 }
@@ -381,10 +388,7 @@ public class Character : MonoBehaviour
             {
                 if (ruleState[rule].trigger)
                 {
-                    bool tmp = rule.CanTrigger(this, distances);
-
                     ruleState[rule].trigger = false;
-                    Debug.Log($"{rule.name} disabled at {Time.time} ({Time.time - ruleState[rule].timeOfTrigger}s elapsed)");
                 }
             }
         }

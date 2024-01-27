@@ -134,6 +134,7 @@ public class CharacterManager : MonoBehaviour
 
                 foreach (var character in characters)
                 {
+                    if (!character.canBeControlled) continue;
                     if (selectedCharacters.IndexOf(character) == -1)
                     {
                         var pos = character.transform.position.xy() + Vector2.up * selectionRadius;
@@ -162,6 +163,7 @@ public class CharacterManager : MonoBehaviour
 
                 foreach (var character in characters)
                 {
+                    if (!character.canBeControlled) continue;
                     if (selectedCharacters.IndexOf(character) == -1)
                     {
                         var pos = character.transform.position.xy() + Vector2.up * selectionRadius;
