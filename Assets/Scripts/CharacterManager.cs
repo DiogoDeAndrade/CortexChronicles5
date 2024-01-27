@@ -67,8 +67,11 @@ public class CharacterManager : MonoBehaviour
 
     private void Update()
     {
-        RunSelection();
-        RunCommands();
+        if (AreaManager.isPlaying)
+        {
+            RunSelection();
+            RunCommands();
+        }
 
         // Evaluate distances
         for (int i = 0; i < characters.Count; i++)

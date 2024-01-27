@@ -107,6 +107,8 @@ public class Character : MonoBehaviour
         {
             animator.SetInteger(apEmotionId, (int)emotion);
 
+            if (!AreaManager.isPlaying) return;
+
             (var closest, var dist) = GetClosestCharacter();
             var lookAtPos = closest?.transform;
 
