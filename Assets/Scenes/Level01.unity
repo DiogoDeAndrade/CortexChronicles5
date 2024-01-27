@@ -244,16 +244,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 112de9933b5147446ba4a225df07130f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextLevelScene: Level01
+  nextLevelScene: Level02
   tutorial:
-  - 'This is the first page of the tutorial...
+  - 'In this simulation, you have to take direct control over the emotisim and lead
+    him to the location indicated by the flag.
 
 
-    Test, xpto...'
-  - 'This is the second page...
+    Emotisims that can be directly
+    controlled are marked with a blue arrow.
 
 
-    Gualter!'
+    To take control of an emotisim,
+    left-click on them.
+
+    To command him to move, point towards a location and
+    right-click.'
+  - Although this is a simulation, emotisims can't move through walls, so you'll
+    have to lead him towards the exit point.
   goal: 0
   target: {fileID: 1692102342}
   radius: 25
@@ -759,7 +766,7 @@ Camera:
     serializedVersion: 2
     x: 0
     y: 0
-    width: 0.99966806
+    width: 1
     height: 0.9995575
   near clip plane: 0.3
   far clip plane: 1000
@@ -16695,9 +16702,19 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "fsd\xE7lksdl\xE7fksld\xE7kf l\xE7sdkfl\xE7sdk fl\xE7sdkfl\xE7s dkfl\xE7
-    ksdl\xE7fk sdl\xE7fk sdl\xE7fk ls\xE7d kfl\xE7sdk fl\xE7sdkf\xE7ls dkfl\xE7skd
-    l\xE7fksd\xE7fl skdl\xE7f ksdl\xE7f ksdl\xE7f"
+  m_text: 'In this simulation, you have to take direct control over the emotisim
+    and lead him to the location indicated by the flag.
+
+
+    Emotisims that can
+    be directly controlled are marked with a blue arrow.
+
+
+    To take control of
+    an emotisim, left-click on them.
+
+    To command him to move, point towards a
+    location and right-click.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0caa1fbe82a96f2449762f61a7d80884, type: 2}
   m_sharedMaterial: {fileID: -2030314929867669046, guid: 0caa1fbe82a96f2449762f61a7d80884, type: 2}
@@ -16966,7 +16983,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Congratulations!
+  m_text: Simulation completed!
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 0caa1fbe82a96f2449762f61a7d80884, type: 2}
   m_sharedMaterial: {fileID: 2100000, guid: ae4e1661fe75b564a8190cbbc7b5b23b, type: 2}
