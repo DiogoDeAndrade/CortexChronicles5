@@ -15,7 +15,7 @@ MonoBehaviour:
   type: 0
   sourceEmotions: 04000000
   neighbourEmotions: 03000000
-  radius: 100
+  radiusScale: 1
   comparison: 5
   count: 2
   targetEmotion: 3

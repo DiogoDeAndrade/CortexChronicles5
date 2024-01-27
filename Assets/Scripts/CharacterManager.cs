@@ -13,7 +13,10 @@ public class CharacterManager : MonoBehaviour
     [SerializeField] private SpriteRenderer selectionBox;
     [SerializeField] public  Bounds         limits;
     [SerializeField] public  LayerMask      losObstacles;
+    [SerializeField] public  LayerMask      moveObstacles;
+    [SerializeField] public  float          neighborRadius = 140.0f;
     [SerializeField] public  bool           checkMovement = true;
+    [SerializeField] private Ruleset        ruleset;
 
     List<Character> characters;
     float           leftClickTime;
@@ -21,6 +24,9 @@ public class CharacterManager : MonoBehaviour
     Vector2         clickPos;
     bool            boxSelect;
     List<Character> selectedCharacters = new List<Character>();
+    List<Rule>      _rules;
+
+    public List<Rule> rules => _rules;
 
     // Start is called before the first frame update
     void Awake()
@@ -36,6 +42,9 @@ public class CharacterManager : MonoBehaviour
         }
 
         characters = new List<Character>();
+
+        _rules = new List<Rule>();
+        ruleset.GetRules(_rules);
     }
 
     public void Add(Character character)
@@ -68,7 +77,7 @@ public class CharacterManager : MonoBehaviour
             {
                 Character character2 = characters[j];
 
-                float distance = Vector3.Distance(pos1, character2.transform.position);
+                float distance = Vector2.Distance(pos1.xy(), character2.transform.position.xy());
 
                 character1.SetDistance(character2, distance);
                 character2.SetDistance(character1, distance);

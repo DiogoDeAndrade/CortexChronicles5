@@ -94,6 +94,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3720326430634744662}
   - component: {fileID: 8952082501003197339}
+  - component: {fileID: 3227209457519185654}
   m_Layer: 0
   m_Name: Character
   m_TagString: Untagged
@@ -142,6 +143,18 @@ MonoBehaviour:
   selectionObject: {fileID: 3464103308230922640}
   characterGfx: {fileID: 5624435524150390262}
   ruleset: {fileID: 11400000, guid: 0f756871a4463374bbe63ffb9c904473, type: 2}
+--- !u!114 &3227209457519185654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2112878103408632516}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f25581c3763ddb44096c22436dfff299, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &3464103308230922640
 GameObject:
   m_ObjectHideFlags: 0

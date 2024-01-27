@@ -14,21 +14,21 @@ public class Rule : ScriptableObject
     [SerializeField] public Type type = Type.ConversionRule;
 
     [SerializeField, ShowIf("isConversionRule")]
-    private Emotion[] sourceEmotions;
+    private Emotion[]   sourceEmotions;
     [SerializeField, ShowIf("isConversionRule")]
-    private Emotion[] neighbourEmotions;
+    private Emotion[]   neighbourEmotions;
     [SerializeField, ShowIf("isConversionRule")]
-    private float radius = 100.0f;
+    private float       radiusScale = 1.0f;
     [SerializeField, ShowIf("isConversionRule")]
-    private Comparison comparison = Comparison.GreaterOrEqual;
+    private Comparison  comparison = Comparison.GreaterOrEqual;
     [SerializeField, ShowIf("isConversionRule")]
-    private int count = 1;
+    private int         count = 1;
     [SerializeField, ShowIf("isConversionRule")]
-    private Emotion targetEmotion;
+    private Emotion     targetEmotion;
     [SerializeField, ShowIf("isConversionRule")]
-    private bool    afterTime = false;
+    private bool        afterTime = false;
     [SerializeField, ShowIf("needTime")]
-    private float   time = 2.0f;
+    private float       time = 2.0f;
 
     bool isConversionRule => type == Type.ConversionRule;
     bool needTime => isConversionRule && afterTime;
@@ -44,10 +44,12 @@ public class Rule : ScriptableObject
     { 
         if (!character.activeEmotion.IsContained(sourceEmotions)) return false;
 
+        float r = CharacterManager.instance.neighborRadius * radiusScale;
+
         int c = 0;
         foreach (var d in distances)
         {
-            if (d.Value < radius)
+            if (d.Value < r)
             {
                 if (d.Key.activeEmotion.IsContained(neighbourEmotions))
                 {

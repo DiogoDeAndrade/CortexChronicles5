@@ -16,7 +16,6 @@ public class Character : MonoBehaviour
     [SerializeField] private Vector2    blinkTime = new Vector2(0.1f, 0.2f);
     [SerializeField] private GameObject selectionObject;
     [SerializeField] private Transform  characterGfx;
-    [SerializeField] private Ruleset    ruleset;
 
     Animator                        animator;
     int                             apEmotionId;
@@ -55,12 +54,6 @@ public class Character : MonoBehaviour
         spriteRendererRightPupil = rightPupil.GetComponent<SpriteRenderer>();
 
         distances = new Dictionary<Character, float>();
-        ruleState = new Dictionary<Rule, RuleState>();
-        // Evaluate rules
-        foreach (var rule in ruleset.rules)
-        {
-            ruleState[rule] = new RuleState { trigger = false, timeOfTrigger = 0.0f };
-        }
 
         selectionObject.SetActive(false);
 
@@ -74,6 +67,13 @@ public class Character : MonoBehaviour
     private void Start()
     {
         CharacterManager.instance.Add(this);
+        ruleState = new Dictionary<Rule, RuleState>();
+
+        var rules = CharacterManager.instance.rules;
+        foreach (var rule in rules)
+        {
+            ruleState[rule] = new RuleState { trigger = false, timeOfTrigger = 0.0f };
+        }
     }
 
     void OnDestroy()
@@ -160,7 +160,7 @@ public class Character : MonoBehaviour
                 Vector2 dir = nextPos - currentPos;
                 float   maxDist = dir.magnitude;
                 dir /= maxDist;
-                if (Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, maxDist, CharacterManager.instance.losObstacles))
+                if (Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, maxDist, CharacterManager.instance.moveObstacles))
                 {
                     // Abort movement, make it so that the destination is the current pos
                     nextPos = currentPos;
@@ -187,16 +187,7 @@ public class Character : MonoBehaviour
 
         characterGfx.localPosition = characterGfxBaseLocalPos + Vector3.up * bounceAmplitude * Mathf.Abs(Mathf.Sin(moveAngle * Mathf.Deg2Rad));
 
-        currentPos = transform.position;
-        currentPos = new Vector3(currentPos.x, currentPos.y, GetZ(currentPos.y));
-        transform.position = currentPos;
-
         EvaluateRules();
-    }
-
-    float GetZ(float y)
-    {
-        return 0.1f * (y + 1000.0f);
     }
 
     public void SetDistance(Character character, float distance)
@@ -372,13 +363,15 @@ public class Character : MonoBehaviour
     void EvaluateRules()
     {
         // Evaluate rules
-        foreach (var rule in ruleset.rules)
+        var rules = CharacterManager.instance.rules;
+        foreach (var rule in rules)
         {
             bool trigger = rule.CanTrigger(this, distances);
             if (trigger)
             {
                 if (!ruleState[rule].trigger)
                 {
+                    Debug.Log($"{rule.name} triggred at {Time.time}");
                     ruleState[rule].trigger = true;
                     ruleState[rule].timeOfTrigger = Time.time;
                 }
@@ -386,7 +379,13 @@ public class Character : MonoBehaviour
             }
             else
             {
-                ruleState[rule].trigger = false;
+                if (ruleState[rule].trigger)
+                {
+                    bool tmp = rule.CanTrigger(this, distances);
+
+                    ruleState[rule].trigger = false;
+                    Debug.Log($"{rule.name} disabled at {Time.time} ({Time.time - ruleState[rule].timeOfTrigger}s elapsed)");
+                }
             }
         }
     }
@@ -420,5 +419,16 @@ public class Character : MonoBehaviour
         }
 
         return ret;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (CharacterManager.instance)
+        {
+            float r = CharacterManager.instance.neighborRadius;
+
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireSphere(transform.position, r);
+        }
     }
 }
