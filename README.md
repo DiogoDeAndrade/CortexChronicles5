@@ -1,5 +1,7 @@
 # THE CORTEX CHRONICLES, CHAPTER 5 - The Simulations of Ignatius Cogwell
 
+![GameScreenshot](Screenshots/screen01.png)
+
 Developed for the Global Game Jam'24 at Lusofona University.
 This year the theme was "Make Me Laugh".
 
@@ -41,6 +43,15 @@ each level.
 
 - All game source code by Diogo de Andrade is licensed under the [MIT] license.
 - All remaining art by Diogo de Andrade, available throught the [CC0] license.
+
+## Screenshots
+
+![GameScreenshot](Screenshots/screen02.png)
+
+![GameScreenshot](Screenshots/screen03.png)
+
+![GameScreenshot](Screenshots/screen04.png)
+
 
 ## Metadata
 
