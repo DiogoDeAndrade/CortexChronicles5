@@ -61,7 +61,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   neighborRadius: 120
+  commandRadius: 200
   checkMovement: 1
+  checkCharacters: 1
   ruleset: {fileID: 11400000, guid: 0f756871a4463374bbe63ffb9c904473, type: 2}
   emotionColors:
   - {r: 1, g: 1, b: 0, a: 1}
@@ -69,6 +71,8 @@ MonoBehaviour:
   - {r: 1, g: 0, b: 0, a: 1}
   - {r: 0, g: 1, b: 0, a: 1}
   - {r: 1, g: 1, b: 1, a: 1}
+  selectSound: {fileID: 8300000, guid: 3630282b8cdcb984688bfc7f15c619ec, type: 3}
+  moveSound: {fileID: 8300000, guid: daf3300cc92090b48ba34ebd17074b95, type: 3}
 --- !u!1 &5600409904824241221
 GameObject:
   m_ObjectHideFlags: 0

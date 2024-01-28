@@ -21,6 +21,8 @@ public class CharacterManager : MonoBehaviour
     [SerializeField] public  bool           checkCharacters = true;
     [SerializeField] private Ruleset        ruleset;
     [SerializeField] private Color[]        emotionColors;
+    [SerializeField] private AudioClip      selectSound;
+    [SerializeField] private AudioClip      moveSound;
 
     List<Character> characters;
     float           leftClickTime;
@@ -140,6 +142,7 @@ public class CharacterManager : MonoBehaviour
                 end.x += selectionRadius;
                 end.y += selectionRadius;
 
+                bool oneSelected = false;
                 foreach (var character in characters)
                 {
                     if (!character.canBeControlled) continue;
@@ -149,6 +152,7 @@ public class CharacterManager : MonoBehaviour
                         if ((pos.x >= start.x) && (pos.x <= end.x) && (pos.y >= start.y) && (pos.y <= end.y))
                         {
                             selectedCharacters.Add(character);
+                            oneSelected = true;
                         }
                     }
                 }
@@ -156,6 +160,11 @@ public class CharacterManager : MonoBehaviour
                 foreach (var selectedCharacter in selectedCharacters)
                 {
                     selectedCharacter.Select(true);
+                }
+
+                if (oneSelected)
+                {
+                    SoundManager.PlaySound(selectSound, Random.Range(0.5f, 0.6f), Random.Range(0.9f, 1.1f));
                 }
             }
             if ((Time.time - leftClickTime) < 0.25f)
@@ -179,6 +188,7 @@ public class CharacterManager : MonoBehaviour
                         if (distance < selectionRadius)
                         {
                             selectedCharacters.Add(character);
+                            SoundManager.PlaySound(selectSound, Random.Range(0.5f, 0.6f), Random.Range(0.9f, 1.1f));
                         }
                     }
                 }
@@ -200,6 +210,11 @@ public class CharacterManager : MonoBehaviour
         foreach (var selectedCharacter in selectedCharacters)
         {
             selectedCharacter.Select(false);
+        }
+
+        if (selectedCharacters.Count > 0)
+        {
+            SoundManager.PlaySound(selectSound, Random.Range(0.25f, 0.3f), Random.Range(0.9f, 1.1f));
         }
 
         selectedCharacters.Clear();
@@ -231,6 +246,10 @@ public class CharacterManager : MonoBehaviour
                 {
                     c.ForceMove(delta);
                 }
+
+                SoundManager.PlaySound(moveSound, Random.Range(0.25f, 0.3f), Random.Range(0.9f, 1.1f));
+
+                rightClickTime = 0.0f;
             }
         }
     }

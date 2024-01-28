@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4199733150042709854}
   - component: {fileID: 6053210442668895095}
+  - component: {fileID: 3463511586546551260}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -45,3 +46,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tutorialEnable: 1
+--- !u!114 &3463511586546551260
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1515411697377440189}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d10d462db0be234dba48d31d1a42c46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  defaultMixerOutput: {fileID: 24300002, guid: 9decdadd3a53b91448b0df279704db1a, type: 2}

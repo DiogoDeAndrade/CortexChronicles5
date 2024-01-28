@@ -38,6 +38,9 @@ public class AreaManager : MonoBehaviour
     private CanvasGroup     tutorialObject;
     [SerializeField]
     private TextMeshProUGUI nextTutorialPage;
+    [SerializeField] AudioClip      hoverSound;
+    [SerializeField] AudioClip      selectSound;
+    [SerializeField] AudioClip      gameMusic;
 
     private float           tutorialFadeSpeed = 2.0f;
 
@@ -75,6 +78,8 @@ public class AreaManager : MonoBehaviour
         congratulations.SetActive(false);
         tutorialObject.gameObject.SetActive(false);
         tutorialText = tutorialObject.GetComponentInChildren<TextMeshProUGUI>();
+
+        SoundManager.PlayMusic(gameMusic);
 
         if (Fader.exists())
         {
@@ -148,6 +153,11 @@ public class AreaManager : MonoBehaviour
         {
             // Reload if R pressed
             Restart();            
+        }
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            // Go back to main menu
+            Fader.FadeOut(() => { SceneManager.LoadScene("TitleScreen"); });
         }
     }
 
@@ -260,4 +270,15 @@ public class AreaManager : MonoBehaviour
                 break;
         }
     }
+
+    public void PlayHoverSound()
+    {
+        SoundManager.PlaySound(hoverSound);
+    }
+
+    public void PlaySelectSound()
+    {
+        SoundManager.PlaySound(selectSound);
+    }
+
 }
