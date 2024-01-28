@@ -38,8 +38,7 @@ public class Character : MonoBehaviour
     float                           speedFactor = 1.0f;
     bool                            dead = false;
     Vector3                         canControlIndicatorBaseLocalPos;
-    Transform                       trackTarget;
-
+    SpriteRenderer                  canControlIndicatorSprite;
     class RuleState
     {
         public bool trigger;
@@ -48,8 +47,31 @@ public class Character : MonoBehaviour
     Dictionary<Rule, RuleState>     ruleState;
 
     public Emotion  activeEmotion => emotion;
-    public bool     canBeControlled => canControl;
+
+    public bool isCommander => (canControl) && (emotion == Emotion.Happy);
+    public bool     canBeControlled
+    {
+        get
+        {
+            if (canControl) return true;
+
+            if (emotion == Emotion.Happy)
+            {
+                foreach (var ent in distances)
+                {
+                    if ((ent.Key.isCommander) && (ent.Value < 140.0f))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+    }
     public bool     isDead => dead;
+
+    public bool isSelected => selectionObject.activeSelf;
 
     void Awake()
     {
@@ -72,7 +94,11 @@ public class Character : MonoBehaviour
         moveCooldown = 2.0f;
 
         characterGfxBaseLocalPos = characterGfx.localPosition;
-        if (canControlIndicator) canControlIndicatorBaseLocalPos = canControlIndicator.transform.localPosition;
+        if (canControlIndicator)
+        {
+            canControlIndicatorBaseLocalPos = canControlIndicator.transform.localPosition;
+            canControlIndicatorSprite = canControlIndicator.GetComponent<SpriteRenderer>();
+        }
     }
 
     private void Start()
@@ -96,8 +122,13 @@ public class Character : MonoBehaviour
     {
         if (canControlIndicator)
         {
-            canControlIndicator.SetActive(canControl && !selectionObject.activeSelf);
+            canControlIndicator.SetActive(canBeControlled && !isSelected);
             canControlIndicator.transform.localPosition = new Vector3(canControlIndicatorBaseLocalPos.x, canControlIndicatorBaseLocalPos.y + 3.0f * Mathf.Sin(Time.time * 10.0f), canControlIndicatorBaseLocalPos.z);
+
+            if (canControlIndicatorSprite)
+            {
+                canControlIndicatorSprite.color = (isCommander) ? (Color.cyan) : (Color.blue);
+            }
         }
 
         if (dead)
@@ -159,32 +190,25 @@ public class Character : MonoBehaviour
             // Movement
             if (forceMove)
             {
-                targetPos = commandTargetPos;
-            }
-            else
-            {
-                if (trackTarget)
+                if (canBeControlled)
                 {
-                    if (Vector2.Distance(transform.position, trackTarget.position) > 30.0f)
-                    {
-                        targetPos = trackTarget.position;
-                    }
-                    else
-                    {
-                        trackTarget = null;
-                        targetPos = transform.position;
-                        moveCooldown = 0.0f;
-                    }
+                    targetPos = commandTargetPos;
                 }
                 else
                 {
-                    if (!IsMoving())
+                    targetPos = commandTargetPos = transform.position;
+                    forceMove = false;
+                    moveCooldown = nextMoveCooldown;
+                }
+            }
+            else
+            {
+                if (!IsMoving())
+                {
+                    moveCooldown -= Time.deltaTime;
+                    if (moveCooldown <= 0.0f)
                     {
-                        moveCooldown -= Time.deltaTime;
-                        if (moveCooldown <= 0.0f)
-                        {
-                            RandomMovement();
-                        }
+                        RandomMovement();
                     }
                 }
             }
@@ -198,31 +222,56 @@ public class Character : MonoBehaviour
 
                 if (CharacterManager.instance.checkMovement)
                 {
+                    // Set filters
+                    ContactFilter2D filterObstacles = new ContactFilter2D();
+                    filterObstacles.SetLayerMask(CharacterManager.instance.moveObstaclesLayer);
+                    ContactFilter2D filterCharacters = new ContactFilter2D();
+                    filterCharacters.SetLayerMask(CharacterManager.instance.characterLayer);
+                    filterCharacters.useTriggers = true;
                     // Check if we can move
                     Vector2 dir = nextPos - currentPos;
                     float maxDist = dir.magnitude;
                     dir /= maxDist;
-                    var hit = Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, maxDist, CharacterManager.instance.moveObstaclesLayer);
-                    if ((hit) && (Vector2.Dot(hit.normal, dir) < 0))
+                    RaycastHit2D[] hitsObstacles = new RaycastHit2D[64];
+                    RaycastHit2D[] hitsCharacters = new RaycastHit2D[64];
+                    var nHitObstacles = Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, filterObstacles, hitsObstacles, maxDist);
+                    var hits = new List<RaycastHit2D>();
+                    for (int i = 0; i < nHitObstacles; i++) hits.Add(hitsObstacles[i]);
+
+                    if (CharacterManager.instance.checkCharacters)
+                    { 
+                        var nHitCharacters = Physics2D.CircleCast(currentPos, 4.0f, dir, filterCharacters, hitsCharacters, maxDist);
+                        for (int i = 0; i < nHitCharacters; i++) hits.Add(hitsCharacters[i]);
+                    }
+                    if (hits.Count > 0)
                     {
-                        if (hit.distance < 1e-6f)
+                        foreach (var hit in hits)
                         {
-                            // Abort movement
-                            targetPos = nextPos = currentPos;
-                            forceMove = false;
-                            moveCooldown = nextMoveCooldown;
-                        }
-                        else
-                        {
-                            // Move to the closest position computed
-                            var moveDelta = nextPos - currentPos;
-                            nextPos = currentPos + moveDelta.normalized * hit.distance;
+                            if (hit.collider == null) continue;
+                            if (Vector2.Dot(hit.normal, dir) > 0) continue;
+                            Character otherCharacter = hit.collider.GetComponent<Character>();
+                            if ((otherCharacter != null) && (otherCharacter == this)) continue;
+                            if (hit.distance < 1e-6f)
+                            {
+                                // Abort movement
+                                targetPos = nextPos = currentPos;
+                                forceMove = false;
+                                moveCooldown = nextMoveCooldown;
+                                break;
+                            }
+                            else
+                            {
+                                // Move to the closest position computed
+                                var moveDelta = nextPos - currentPos;
+                                nextPos = currentPos + moveDelta.normalized * hit.distance;
 
-                            // Compute the new move direction with sliding
-                            moveDelta = (currentPos + moveDelta) - nextPos;
-                            moveDelta = moveDelta - hit.normal * Vector2.Dot(hit.normal, moveDelta);
+                                // Compute the new move direction with sliding
+                                moveDelta = (currentPos + moveDelta) - nextPos;
+                                moveDelta = moveDelta - hit.normal * Vector2.Dot(hit.normal, moveDelta);
 
-                            nextPos = nextPos + moveDelta;
+                                nextPos = nextPos + moveDelta;
+                                break;
+                            }
                         }
                     }
                 }
@@ -348,7 +397,7 @@ public class Character : MonoBehaviour
 
         switch (emotion)
         {
-            case Emotion.Happy:
+/*            case Emotion.Happy:
                 {
                     // Happy checks if any Happy near him is moving, if it is, it also moves towards that position, relative to
                     // him (but slower)
@@ -367,8 +416,6 @@ public class Character : MonoBehaviour
                                 foundMoving = true;
                                 speedFactor = c.GetSpeedFactor() * 0.8f;
                                 nextMoveCooldown = 2.0f;
-
-                                trackTarget = c.transform;
                                 break;
                             }
                         }
@@ -387,7 +434,7 @@ public class Character : MonoBehaviour
                         }
                     }
                 }
-                break;
+                break;*/
             case Emotion.Sad:
                 {
                     // Sad tries to get away from closest person, at half-speed
@@ -418,6 +465,7 @@ public class Character : MonoBehaviour
             case Emotion.Serene:
                 // Serene doesn't move, just stays in the same place
                 break;
+            case Emotion.Happy:
             case Emotion.Neutral:
                 {
                     // Neutral moves around the place where he is after the last movement

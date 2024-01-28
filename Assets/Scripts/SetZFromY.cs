@@ -13,6 +13,6 @@ public class SetZFromY : MonoBehaviour
 
     float GetZ(float y)
     {
-        return 0.1f * (y + 1000.0f);
+        return 1.0f * (y + 500.0f);
     }
 }

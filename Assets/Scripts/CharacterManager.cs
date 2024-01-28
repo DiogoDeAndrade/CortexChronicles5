@@ -17,6 +17,7 @@ public class CharacterManager : MonoBehaviour
     [SerializeField] public  LayerMask      characterLayer;
     [SerializeField] public  float          neighborRadius = 140.0f;
     [SerializeField] public  bool           checkMovement = true;
+    [SerializeField] public  bool           checkCharacters = true;
     [SerializeField] private Ruleset        ruleset;
     [SerializeField] private Color[]        emotionColors;
 
