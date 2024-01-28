@@ -48,18 +48,18 @@ public class Character : MonoBehaviour
 
     public Emotion  activeEmotion => emotion;
 
-    public bool isCommander => (canControl) && (emotion == Emotion.Happy);
+    public bool isCommander => canControl;
     public bool     canBeControlled
     {
         get
         {
             if (canControl) return true;
 
-            if (emotion == Emotion.Happy)
+            if ((emotion == Emotion.Happy) || (emotion == Emotion.Serene))
             {
                 foreach (var ent in distances)
                 {
-                    if ((ent.Key.isCommander) && (ent.Value < 140.0f))
+                    if ((ent.Key.isCommander) && (ent.Key.activeEmotion == emotion) && (ent.Value < CharacterManager.instance.commandRadius))
                     {
                         return true;
                     }
@@ -234,7 +234,7 @@ public class Character : MonoBehaviour
                     dir /= maxDist;
                     RaycastHit2D[] hitsObstacles = new RaycastHit2D[64];
                     RaycastHit2D[] hitsCharacters = new RaycastHit2D[64];
-                    var nHitObstacles = Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 22.0f, dir, filterObstacles, hitsObstacles, maxDist);
+                    var nHitObstacles = Physics2D.CircleCast(currentPos + Vector2.up * 16.0f, 16.0f, dir, filterObstacles, hitsObstacles, maxDist);
                     var hits = new List<RaycastHit2D>();
                     for (int i = 0; i < nHitObstacles; i++) hits.Add(hitsObstacles[i]);
 
@@ -596,6 +596,12 @@ public class Character : MonoBehaviour
 
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, r);
+
+            if (isCommander)
+            {
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawWireSphere(transform.position, CharacterManager.instance.commandRadius);
+            }
         }
     }
 
